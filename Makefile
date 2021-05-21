@@ -1,61 +1,34 @@
-ASM := nasm
-RUST := cargo +nightly rustc
-AR := ar
-LD := ld
-OBJCOPY := objcopy
-EMULATOR := qemu-system-i386 -nographic
-
-RUST_TARGET := x86_real-unknown-none
-RUST_FLAGS := --target $(RUST_TARGET).json -Z build-std=core,alloc
-
+include commons/commons.mk
 
 .PHONY: run
 run: build
-	$(EMULATOR) boot.bin
+	@echo "$(STYLE_BOLD)- Running image..$(STYLE_RESET)"
+	$(EMULATOR) target/boot.bin
 
 .PHONY: run-debug
 run-debug: build
-	$(EMULATOR) -s -S boot.bin
+	@echo "$(STYLE_BOLD)- Running image in debug mode..$(STYLE_RESET)"
+	@echo " Use ‘make start-gdb‘ to start debugging."
+	$(EMULATOR) -s -S target/boot.bin
 
 .PHONY: start-gdb
 start-gdb:
 	gdb -ex "target remote localhost:1234" -ex "symbol-file boot.elf" -ex "br *0x7c00"
 
 .PHONY: build
-build: boot.bin
-	@echo "[!] Build successful"
-
-
-boot.bin: bootloader.o bootram.o boot.ld
-	$(eval bootloader_size := $(shell size bootloader.o | tail -1 | cut -f 4))
-	@echo "=> Bootloader is using $(bootloader_size) bytes out of 512\
-	 ($(shell awk 'BEGIN{printf("%.2f",$(bootloader_size)/512*100)}')%)."
-	@if [ $(bootloader_size) -gt 512 ]; then echo "error: bootloader too large" && exit 1; fi
-	$(LD) -T boot.ld -m elf_i386 -o boot.elf bootloader.o bootram.o
-	$(OBJCOPY) -S -O binary boot.elf boot.bin
-	@echo "=> Boot image is $$(stat --printf="%s" boot.bin) bytes long."
-
-bootloader.o: bootloader.asm
-	@echo "- Compiling bootloader.."
-	$(ASM) -g -F dwarf -f elf32 bootloader.asm -o bootloader.o
-
-bootram.o: bootram.rs
-	$(eval target := target/$(RUST_TARGET)/debug/libbootram.a)
-	@echo "- Compiling bootram.."
-	$(RUST) $(RUST_FLAGS) -- -C panic=abort --emit=obj
-	@$(AR) x $(target) $$(ar t $(target) | grep bootram)
-	@mv -v bootram-*.o bootram.o
-
+build:
+	@mkdir -pv target
+	@$(MAKE) -C boot build
+	@echo "$(STYLE_BOLD)[!] Build successful$(STYLE_RESET)"
 
 .PHONY: clean
 clean:
-	@echo "- Cleaning.."
-	rm -rfv *.bin *.o *.elf
+	@echo "$(STYLE_BOLD)- Cleaning..$(STYLE_RESET)"
+	rm -rfv $(TARGET_DIR)/*.o
 
 .PHONY: clean-all
-clean-all:
-	make clean
-	rm -rfv target/ Cargo.lock
+clean-all: clean
+	rm -rfv $(CARGO_PATH) boot/Cargo.lock
 
 .PHONY: print-versions
 print-versions:

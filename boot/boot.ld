@@ -7,15 +7,15 @@ MEMORY {
 
 SECTIONS {
     bootloader : {
-        bootloader.o(.text)
-        bootloader.o(.data)
+        *bootloader.o(.text)
+        *bootloader.o(.data)
         . = 0x1fe;
         SHORT(0xaa55)
     } > bootloader
     bootram : {
         bootram_data = .;
-        bootram.o(.text)
-        bootram.o(.data)
-        bootram.o(.bss)
+        *bootram.o(.text)
+        *bootram.o(.data)
+        *bootram.o(.bss)
     } > bootram
 }
