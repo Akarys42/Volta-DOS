@@ -9,5 +9,6 @@ fn panic(_: &PanicInfo) -> ! {
 
 #[no_mangle]
 pub extern "C" fn bootram_entry() -> ! {
+    panic!();
     loop {}
 }
