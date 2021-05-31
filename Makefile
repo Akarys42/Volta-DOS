@@ -24,11 +24,11 @@ build:
 .PHONY: clean
 clean:
 	@echo "$(STYLE_BOLD)- Cleaning..$(STYLE_RESET)"
-	rm -rfv $(TARGET_DIR)/*.o
+	rm -rfv $(TARGET_DIR)/*.o $(TARGET_DIR)/*.bin $(TARGET_DIR)/*.elf
 
-.PHONY: clean-all
-clean-all: clean
-	rm -rfv $(CARGO_PATH) boot/Cargo.lock
+.PHONY: clean-cargo
+clean-cargo: clean
+	rm -rfv $(CARGO_TARGET_DIR) boot/Cargo.lock
 
 .PHONY: print-versions
 print-versions:
