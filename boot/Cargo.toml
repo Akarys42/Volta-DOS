@@ -1,10 +1,10 @@
 [package]
 name = "bootram"
 version = "0.1.0"
-authors = ["GitHub <noreply@github.com>"]
+authors = ["Matteo Bertucci <matteobertucci2004@gmail.com>"]
 edition = "2018"
 
 [lib]
-path = "bootram.rs"
+path = "bootram/bootram.rs"
 name = "bootram"
 crate-type = ["staticlib"]

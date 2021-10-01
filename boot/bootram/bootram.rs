@@ -1,4 +1,6 @@
 #![no_std]
+#![no_main]
+#![feature(asm)]
 
 use core::panic::PanicInfo;
 
@@ -9,5 +11,11 @@ fn panic(_: &PanicInfo) -> ! {
 
 #[no_mangle]
 pub extern "C" fn bootram_entry() -> ! {
+    unsafe {asm!("
+    mov al, 'X'
+    mov ah, 0x0e
+    int 0x10
+    ")};
+
     loop {}
 }

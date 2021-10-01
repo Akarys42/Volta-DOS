@@ -18,6 +18,8 @@ bootloader_entry:
   mov si, message_loaded_bootram
   call print_str
 
+  jmp bootram_entry
+
   ; Stop the cpu
   mov si, message_halting
   call print_str
