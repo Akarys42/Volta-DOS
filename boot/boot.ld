@@ -14,8 +14,6 @@ SECTIONS {
     } > bootloader
     bootram : {
         bootram_data = .;
-        *bootram.o(.text)
-        *bootram.o(.data)
-        *bootram.o(.bss)
+        *bootram.a:*
     } > bootram
 }

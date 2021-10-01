@@ -24,7 +24,7 @@ build:
 .PHONY: clean
 clean:
 	@echo "$(STYLE_BOLD)- Cleaning..$(STYLE_RESET)"
-	rm -rfv $(TARGET_DIR)/*.o $(TARGET_DIR)/*.bin $(TARGET_DIR)/*.elf
+	rm -rfv $(TARGET_DIR)/*.o $(TARGET_DIR)/*.bin $(TARGET_DIR)/*.elf $(TARGET_DIR)/*.a
 
 .PHONY: clean-cargo
 clean-cargo: clean
@@ -35,6 +35,5 @@ print-versions:
 	@$(ASM) -v
 	@cargo -V
 	@rustc -V
-	@$(AR) -V | head -n 1
 	@$(LD) -v
 	@$(OBJCOPY) -V | head -n 1

@@ -5,7 +5,13 @@
 use core::panic::PanicInfo;
 
 #[panic_handler]
-fn panic(_: &PanicInfo) -> ! {
+fn panic_handler(_: &PanicInfo) -> ! {
+    unsafe {asm!("
+    mov al, 'P'
+    mov ah, 0x0e
+    int 0x10
+    ")};
+
     loop {}
 }
 
@@ -16,6 +22,7 @@ pub extern "C" fn bootram_entry() -> ! {
     mov ah, 0x0e
     int 0x10
     ")};
+    panic!();
 
     loop {}
 }
