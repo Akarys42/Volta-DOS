@@ -13,7 +13,7 @@ run-debug: build
 
 .PHONY: start-gdb
 start-gdb:
-	gdb -ex "target remote localhost:1234" -ex "symbol-file boot.elf" -ex "br *0x7c00"
+	gdb -ex "target remote localhost:1234" -ex "symbol-file target/boot.elf" -ex "br *0x7c00"
 
 .PHONY: build
 build:

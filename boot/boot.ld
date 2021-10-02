@@ -14,6 +14,6 @@ SECTIONS {
     } > bootloader
     bootram : {
         bootram_data = .;
-        *bootram.a:*
+        *bootram.a:*;
     } > bootram
 }
