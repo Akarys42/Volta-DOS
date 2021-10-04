@@ -14,7 +14,13 @@ $(TARGET_DIR)/boot.bin: $(TARGET_DIR)/bootloader.o $(TARGET_DIR)/bootram.o boot.
 	@if [ $(bootloader_size) -gt 512 ]; then echo "error: bootloader too large" && exit 1; fi
 
 	$(LD) -T boot.ld -m elf_i386 --gc-sections -o $(TARGET_DIR)/boot.elf $(TARGET_DIR)/bootloader.o $(TARGET_DIR)/bootram.a
+
 	python3 set_bootram_size.py $(TARGET_DIR)/boot.elf
+
+	$(eval bootram_size := $(shell expr $(shell size $(TARGET_DIR)/boot.elf | tail -1 | cut -f 4) - 512))
+	@echo "$(STYLE_BOLD)=> Bootram is using $(shell printf %\'d $(bootram_size)) bytes out of 492,032\
+	 ($(shell awk 'BEGIN{printf("%.2f",$(bootram_size)/492032*100)}')%).$(STYLE_RESET)"
+
 	$(OBJCOPY) -S -O binary $(TARGET_DIR)/boot.elf $(TARGET_DIR)/boot.bin
 	@echo "$(STYLE_BOLD)=> Boot image is $$(stat --printf="%s" $(TARGET_DIR)/boot.bin) bytes long.$(STYLE_RESET)"
 
