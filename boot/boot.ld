@@ -1,8 +1,9 @@
 ENTRY(bootloader_entry)
 
 MEMORY {
-    bootloader (RX) : ORIGIN = 0x7c00, LENGTH = 0x200
-    bootram (WX)    : ORIGIN = 0x7e00, LENGTH = 0x78200
+    bootloader (RX)  : ORIGIN = 0x7c00,  LENGTH = 512
+    bootram (WX)     : ORIGIN = 0x7e00,  LENGTH = 3608576
+    bootram_heap (X) : ORIGIN = 0x76000, LENGTH = 40960
 }
 
 SECTIONS {
@@ -16,4 +17,8 @@ SECTIONS {
         bootram_data = .;
         *bootram.a:*;
     } > bootram
+    bootram_heap : {
+        bootram_heap_start = ORIGIN(bootram_heap);
+        bootram_heap_end = LENGTH(bootram_heap);
+    } > bootram_heap
 }

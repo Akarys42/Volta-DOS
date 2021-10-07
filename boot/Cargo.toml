@@ -8,3 +8,6 @@ edition = "2018"
 path = "bootram/bootram.rs"
 name = "bootram"
 crate-type = ["staticlib"]
+
+[dependencies]
+buddy_system_allocator = "0.8.0"
