@@ -1,0 +1,57 @@
+## Rocket build configuration for the boot system
+# Build using ./rocket.sh build boot
+
+targets:
+  boot.bin:
+    name: Copying boot image
+    requires:
+      - boot.elf
+    recipe:
+      - {{ Tools.objcopy }} -S -O binary {{ boot.elf }} {{ target }}
+                                                                                                 
+  boot.elf:
+    name: Assembling boot image
+    requires:
+      - bootloader.o
+      - bootram.a
+    uses:
+      - boot.ld
+      - set_bootram_size.py
+    recipe:
+      - {{ Tools.ld }} -T boot.ld -m elf_i386 --gc-sections -o {{ target }} {{ bootloader.o }} {{ bootram.a }}
+      - {{ Tools.python3 }} set_bootram_size.py {{ target }}
+    checks:
+      - name: Bootloader size
+        type: file_size
+        file: bootloader.o
+        limit: 512
+      - name: Bootram size
+        type: file_size_elf
+        file: boot.elf
+        offset: -512
+        limit: 3608576
+    post:
+      - name: Boot image
+        type: file_size_elf
+        file: boot.elf
+  
+  bootram.a:
+    name: Compiling bootram
+    target_type: cargo
+    cargo_target: libbootram.a
+    uses:
+      - bootram/*
+      - Cargo.toml
+      - Cargo.lock
+    recipe:
+      - {{ Tools.cargo }}
+        --target ../commons/i386-unknown-none-code16.json
+        --target_dir {{ target }} -Z build-std=core,alloc 
+        --release -- -C panic=abort --emit=obj
+  
+  bootloader.o:
+    name: Assembling bootloader
+    uses:
+      - bootloader.asm
+    recipe:
+      - {{ Tools.nasm }} -g -F dwarf -f elf32 -o {{ target }} {{ bootloader.asm }}
